@@ -11,7 +11,8 @@ import ContestPlayer from "./contest_player";
 enum ContestType {
   NOI = "noi",
   IOI = "ioi",
-  ICPC = "acm"
+  ICPC = "acm",
+  CS208 = "cs208"
 }
 
 @TypeORM.Entity()
@@ -74,6 +75,7 @@ export default class Contest extends Model {
 
   allowedSeeingOthers() {
     if (this.type === 'acm') return true;
+    if (this.type === 'cs208') return true;
     else return false;
   }
 
@@ -84,6 +86,7 @@ export default class Contest extends Model {
 
   allowedSeeingResult() { // If not, then the user can only see compile progress
     if (this.type === 'ioi' || this.type === 'acm') return true;
+    if (this.type === 'cs208') return true;
     else return false;
   }
 
