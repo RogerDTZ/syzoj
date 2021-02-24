@@ -107,7 +107,7 @@ app.post("/contest/:id/edit", async (req, res) => {
       ranklist = await ContestRanklist.create();
 
       // Only new contest can be set type
-      if (!["noi", "ioi", "acm"].includes(req.body.type))
+      if (!["noi", "ioi", "acm", "cs208"].includes(req.body.type))
         throw new ErrorMessage("无效的赛制。");
       contest.type = req.body.type;
     } else {
@@ -248,6 +248,18 @@ app.get("/contest/:id", async (req, res) => {
           } else {
             problem.status = null;
           }
+        } else if (contest.type === "cs208") {
+          if (player.score_details[problem.problem.id]) {
+            problem.status = {
+              accepted: player.score_details[problem.problem.id].accepted,
+              unacceptedCount:
+                player.score_details[problem.problem.id].unacceptedCount,
+            };
+            problem.judge_id =
+              player.score_details[problem.problem.id].judge_id;
+          } else {
+            problem.status = null;
+          }
         }
       }
     }
@@ -269,7 +281,7 @@ app.get("/contest/:id", async (req, res) => {
           if (player.score_details[problem.problem.id]) {
             problem.statistics.attempt++;
             if (
-              (contest.type === "acm" &&
+              ((contest.type === "acm" || contest.type === "cs208") &&
                 player.score_details[problem.problem.id].accepted) ||
               ((contest.type === "noi" || contest.type === "ioi") &&
                 player.score_details[problem.problem.id].score === 100)
@@ -340,6 +352,7 @@ app.get("/contest/:id/ranklist", async (req, res) => {
         player.score = 0;
       }
 
+      console.log(JSON.stringify(player.score_details))
       for (let i in player.score_details) {
         player.score_details[i].judge_state = await JudgeState.findById(
           player.score_details[i].judge_id

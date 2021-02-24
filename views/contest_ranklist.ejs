@@ -20,7 +20,7 @@
                 <% } %>
                 <% if (contest.type === 'cs208') { %>
                   <th>通过数量</th>
-                  <th>罚时</th>
+                  <th>罚分</th>
                 <% } %>
                 <% for (let i = 0; i < problems.length; i++) { %>
                 <th>
@@ -74,7 +74,7 @@
                   } else if (contest.type === 'cs208') {
                     for (let problem of problems) {
                       if (item.player.score_details[problem.id] && item.player.score_details[problem.id].accepted) {
-                        timeSum += (item.player.score_details[problem.id].acceptedTime - contest.start_time) + (item.player.score_details[problem.id].unacceptedCount * 20 * 60);
+                        timeSum += item.player.score_details[problem.id].unacceptedCount * 5
                         unacceptedCount += item.player.score_details[problem.id].unacceptedCount;
                       }
                     }
@@ -114,7 +114,7 @@
                     </span>
                   </td>
                   <td>
-                    <%= syzoj.utils.formatTime(timeSum) %>
+                    <%= -timeSum %>
                   </td>
                 <% } %>
                 <% for (let problem of problems) { %>
