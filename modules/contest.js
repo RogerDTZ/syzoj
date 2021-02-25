@@ -391,7 +391,7 @@ app.get("/contest/:id/ranklist", async (req, res) => {
           player.score_details[i].weighted_score =
             player.score_details[i].score == null
               ? null
-              : Math.round(player.score_details[i].score -  * multiplier);
+              : Math.round(player.score_details[i].score - 5 * multiplier);
           player.score += 100
           player.score += player.score_details[i].weighted_score;
         }
