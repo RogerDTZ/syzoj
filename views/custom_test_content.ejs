@@ -8,14 +8,14 @@
         <i class="<%= icon[getStatusMeta(custom_test.status)] || 'remove' %> icon"></i>
         <%= custom_test.status %></div>
         <% if (!custom_test.pending) { %>
-          <div class="four wide column">用时：<span style="font-weight: normal; "><%= custom_test.time %> ms</span></div>
-          <div class="four wide column">内存：<span style="font-weight: normal; "><%= custom_test.memory %> KiB</span></div>
+          <div class="four wide column">Time usage：<span style="font-weight: normal; "><%= custom_test.time %> ms</span></div>
+          <div class="four wide column">Memory usage：<span style="font-weight: normal; "><%= custom_test.memory %> KiB</span></div>
         <% } %>
       </div>
     </div>
     <% if (!custom_test.pending) { %>
       <div class="content">
-        <strong>选手输出</strong>
+        <strong>User output</strong>
         <div class="ui existing segment"><pre style="margin-top: 0; margin-bottom: 0; "><code><%= custom_test.result.user_out %></code></pre></div>
       </div>
     <% } %>
