@@ -351,8 +351,12 @@ app.get("/contest/:id/ranklist", async (req, res) => {
       if (contest.type === "noi" || contest.type === "ioi") {
         player.score = 0;
       }
+      if (contest.type === "cs208") {
+        player.score = 0;
+      }
 
       console.log(JSON.stringify(player.score_details))
+      console.log(JSON.stringify(contest.ranklist.ranking_params))
       for (let i in player.score_details) {
         player.score_details[i].judge_state = await JudgeState.findById(
           player.score_details[i].judge_id
@@ -365,6 +369,30 @@ app.get("/contest/:id/ranklist", async (req, res) => {
             player.score_details[i].score == null
               ? null
               : Math.round(player.score_details[i].score * multiplier);
+          player.score += player.score_details[i].weighted_score;
+        }
+        if (contest.type === "cs208") {
+          console.log("submissions")
+          console.log(player.score_details.submissions)
+          // for (let submission of ) {
+          //   let i = 0, min, minPos = -1;
+          //   for (let item of ranklist) {
+          //     i++;
+          //     let condition = item.player.score_details[problem.id] && item.player.score_details[problem.id].accepted && (minPos === -1 || item.player.score_details[problem.id].acceptedTime < min.player.score_details[problem.id].acceptedTime);
+          //     if (condition) {
+          //       min = item;
+          //       minPos = i;
+          //     }
+          //   }
+          //   problem.min = minPos;
+          // }
+          console.log()
+          let multiplier = (contest.ranklist.ranking_params || {})[i] || 0.0;
+          player.score_details[i].weighted_score =
+            player.score_details[i].score == null
+              ? null
+              : Math.round(player.score_details[i].score -  * multiplier);
+          player.score += 100
           player.score += player.score_details[i].weighted_score;
         }
       }
