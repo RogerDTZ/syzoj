@@ -34,15 +34,15 @@
   <table class="ui very basic center aligned table" id="status_table">
     <thead>
       <tr>
-        <th>编号</th>
-        <th>题目</th>
-        <th>状态</th>
-        <th v-if="displayConfig.showScore">分数</th>
-        <th v-if="displayConfig.showUsage">总时间</th>
-        <th v-if="displayConfig.showUsage">内存</th>
-        <th v-if="displayConfig.showCode">代码 / 答案文件</th>
-        <th>提交者</th>
-        <th>提交时间</th>
+        <th>ID</th>
+        <th>Problem</th>
+        <th>Status</th>
+        <th v-if="displayConfig.showScore">Score</th>
+        <th v-if="displayConfig.showUsage">Time Usage</th>
+        <th v-if="displayConfig.showUsage">Memory Usage</th>
+        <th v-if="displayConfig.showCode">Code</th>
+        <th>User</th>
+        <th>Time</th>
         <th v-if="showRejudge">重新评测</th>
       </tr>
     </thead>

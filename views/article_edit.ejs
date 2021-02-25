@@ -14,11 +14,11 @@
     <div class="ui bottom attached tab segment active" data-tab="edit">
       <div class="ui form">
         <div class="field">
-          <label for="title">标题</label>
+          <label for="title">Title</label>
           <input type="text" id="title" name="title" value="<%= article.title %>">
         </div>
         <div class="field">
-          <label for="content">内容</label>
+          <label for="content">Content</label>
           <textarea rows="15" id="content" name="content" class="markdown-edit"><%= article.content %></textarea>
         </div>
       </div>
@@ -26,7 +26,7 @@
     <% if (user && user.is_admin) { %>
         <div class="ui <% if (article.is_notice) { %>checked <% } %>checkbox" style="margin-top: 15px; ">
           <input <% if (article.is_notice) { %>checked=""<% } %> name="is_notice" type="checkbox">
-          <label><strong>公告</strong></label>
+          <label><strong>Broadcast</strong></label>
           <p style="margin-top: 5px; ">选择后将显示在首页公告栏。</p>
         </div>
       <% } %>

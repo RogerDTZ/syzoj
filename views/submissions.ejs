@@ -17,28 +17,28 @@
   <form action="<%= syzoj.utils.makeUrl(displayConfig.inContest ? ['contest', contest.id, 'submissions'] : ['submissions']) %>" class="ui mini form" method="get" role="form" id="form">
     <input type="hidden" name="contest" value="<%= form.contest %>" />
     <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
-      <label style="font-size: 1.2em; margin-right: 1px; ">题目：</label>
+      <label style="font-size: 1.2em; margin-right: 1px; ">Problem：</label>
       <div class="field"><input name="problem_id" style="width: 50px; " type="text" value="<%= form.problem_id %>"></div>
       <% if (displayConfig.showOthers) { %>
-        <label style="font-size: 1.2em; margin-right: 1px; ">提交者：</label>
+        <label style="font-size: 1.2em; margin-right: 1px; ">User：</label>
         <div class="field"><input name="submitter" style="width: 100px; " type="text" value="<%= form.submitter %>"></div>
       <% } %>
       <% if (displayConfig.showScore) { %>
-        <label style="font-size: 1.2em; margin-right: 1px; ">分数：</label>
+        <label style="font-size: 1.2em; margin-right: 1px; ">Score：</label>
         <div class="field" style="padding-right: 6px; "><input name="min_score" style="width: 45px; " type="text" value="<%= form.min_score || 0 %>"></div>
         <label style="font-size: 1.2em; margin-right: 7px; ">～</label>
         <div class="field"><input name="max_score" style="width: 45px; " type="text" value="<%= form.max_score || 100 %>"></div>
       <% } %>
-      <label style="font-size: 1.2em; margin-right: 1px; ">语言：</label>
+      <label style="font-size: 1.2em; margin-right: 1px; ">Language：</label>
       <div class="field">
         <div class="ui fluid selection dropdown" id="select_language" style="width: 110px; ">
           <input type="hidden" name="language" value="<%= form.language %>">
           <i class="dropdown icon"></i>
           <div class="default text"></div>
           <div class="menu">
-            <div class="item" data-value=""><b>不限</b></div>
-            <div class="item" data-value="submit-answer"><b>提交答案</b></div>
-            <div class="item" data-value="non-submit-answer"><b>非提交答案</b></div>
+            <div class="item" data-value=""><b>All</b></div>
+            <!-- <div class="item" data-value="submit-answer"><b>Submit-Answer</b></div>
+            <div class="item" data-value="non-submit-answer"><b>Not submi</b></div> -->
             <% for (let lang of syzoj.config.filter_enabled_languages) { %>
               <div style="font-size: 12.5px; " class="item" data-value="<%= lang %>"><b><%= syzoj.languages[lang].show %></b></div>
             <% } %>
@@ -46,14 +46,14 @@
         </div>
       </div>
       <% if (displayConfig.showResult) { %>
-        <label style="font-size: 1.2em; margin-right: 1px; ">状态：</label>
+        <label style="font-size: 1.2em; margin-right: 1px; ">Status：</label>
         <div class="field">
           <div class="ui fluid selection dropdown" id="select_status" style="width: 210px; ">
             <input type="hidden" name="status" value="<%= form.status %>">
             <i class="dropdown icon"></i>
             <div class="default text"></div>
             <div class="menu">
-              <div class="item" data-value=""><b>不限</b><i class="dropdown icon" style="visibility: hidden; "></i></div>
+              <div class="item" data-value=""><b>All</b><i class="dropdown icon" style="visibility: hidden; "></i></div>
               <% for (let status in this.icon) { %>
                 <% if (this.iconHidden.includes(status)) continue; %>
                 <div class="item" data-value="<%= status === 'Pending' ? 'Waiting' : status %>"><span class="status <%= status.toLowerCase().split(' ').join('_') %>"><i class="<%= this.icon[status] %> icon"></i> <b><%= status %></b></div>
@@ -64,12 +64,12 @@
       <% } %>
       <button class="ui labeled icon mini button" type="submit">
         <i class="search icon"></i>
-        查询
+        Search
       </button>
       <% if (user && displayConfig.showOthers) { %>
       <a class="ui mini labeled icon blue button" style="margin-left: auto; " id="my_submit">
         <i class="user icon"></i>
-        我的提交
+        Mine
       </a>
       <script>
       $(function () {
@@ -85,15 +85,15 @@
   <table id="vueAppFuckSafari" class="ui very basic center aligned table" style="white-space: nowrap; " id="table">
     <thead>
       <tr>
-        <th>编号</th>
-        <th>题目</th>
-        <th>状态</th>
-        <th v-if="displayConfig.showScore">分数</th>
-        <th v-if="displayConfig.showUsage">总时间</th>
-        <th v-if="displayConfig.showUsage">内存</th>
-        <th v-if="displayConfig.showCode">代码 / 答案文件</th>
-        <th>提交者</th>
-        <th>提交时间</th>
+        <th>ID</th>
+        <th>Problem</th>
+        <th>Status</th>
+        <th v-if="displayConfig.showScore">Score</th>
+        <th v-if="displayConfig.showUsage">Time Usage</th>
+        <th v-if="displayConfig.showUsage">Memory Usage</th>
+        <th v-if="displayConfig.showCode">Code</th>
+        <th>User</th>
+        <th>Time</th>
       </tr>
     </thead>
     <tbody>
@@ -107,10 +107,10 @@
     <div class="ui icon header">
       <% if (isFiltered) { %>
       <i class="ui search icon" style="margin-bottom: 20px; "></i>
-      找不到符合条件的提交
+      No results
       <% } else { %>
       <i class="ui file icon" style="margin-bottom: 20px; "></i>
-      暂无提交
+      No results
       <% } %>
     </div>
   </div>

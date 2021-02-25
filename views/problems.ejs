@@ -1,4 +1,4 @@
-<% this.title = '题库' %>
+<% this.title = 'Problems' %>
 <% include header %>
 <%
 let tagIDs = [];
@@ -25,7 +25,7 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
           <form action="<%= syzoj.utils.makeUrl(['problems', 'search']) %>" method="get">
             <div class="ui search" style="width: 280px; height: 28px; margin-top: -5.3px; ">
               <div class="ui left icon input" style="width: 100%; ">
-                <input class="prompt" style="width: 100%; " type="text" value="<%= req.query.keyword %>" placeholder="ID / 题目名 …" name="keyword">
+                <input class="prompt" style="width: 100%; " type="text" value="<%= req.query.keyword %>" placeholder="ID / Title …" name="keyword">
                 <i class="search icon"></i>
               </div>
               <div class="results" style="width: 100%; "></div>
@@ -89,13 +89,13 @@ if (typeof tags !== 'undefined') tagIDs = tags.map(x => x.id);
     <thead>
       <tr>
         <% if (user) { %>
-        <th class="one wide">提交状态</th>
+        <th class="one wide">Status</th>
         <% } %>
-        <th class="one wide"><%- createSortableTitle('id', '编号', true) %></th>
-        <th class="left aligned"><%- createSortableTitle('title', '题目名称', true) %></th>
-        <th class="one wide"><%- createSortableTitle('ac_num', '通过', false) %></th>
-        <th class="one wide"><%- createSortableTitle('submit_num', '提交', false) %></th>
-        <th class="one wide">通过率</th>
+        <th class="one wide"><%- createSortableTitle('id', 'ID', true) %></th>
+        <th class="left aligned"><%- createSortableTitle('title', 'Title', true) %></th>
+        <th class="one wide"><%- createSortableTitle('ac_num', 'Accetped', false) %></th>
+        <th class="one wide"><%- createSortableTitle('submit_num', 'Submitted', false) %></th>
+        <th class="one wide">Rate</th>
       </tr>
     </thead>
     <tbody>
