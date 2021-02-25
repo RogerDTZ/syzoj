@@ -196,13 +196,11 @@ app.get('/submission/:id', async (req, res) => {
       formattedCode: judge.formattedCode ? judge.formattedCode.toString("utf8") : null,
       preferFormattedCode: res.locals.user ? res.locals.user.prefer_formatted_code : true,
       detailResult: processOverallResult(judge.result, displayConfig),
-      // TODO: fill in socket token here
-      /*socketToken: (judge.pending && judge.task_id != null) ? jwt.sign({
+      socketToken: (judge.pending && judge.task_id != null) ? jwt.sign({
         taskId: judge.task_id,
         type: 'detail',
         displayConfig: displayConfig
-      }, syzoj.config.session_secret) : null,*/
-      socketToken: judge.pending && judge.task_id != null ? judge.task_id : null,
+      }, syzoj.config.session_secret) : null,
       displayConfig: displayConfig,
     });
   } catch (e) {
