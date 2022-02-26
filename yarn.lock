@@ -2821,9 +2821,9 @@ prepend-http@^2.0.0:
   integrity sha1-6SQ0v6XqjBn0HN/UAddBo8gZ2Jc=
 
 prismjs@^1.24.1:
-  version "1.24.1"
-  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.24.1.tgz#c4d7895c4d6500289482fa8936d9cdd192684036"
-  integrity sha512-mNPsedLuk90RVJioIky8ANZEwYm5w9LcvCXrxHlwf4fNVSn8jEipMybMkWUyyF0JhnC+C4VcOVSBuHRKs1L5Ow==
+  version "1.27.0"
+  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.27.0.tgz#bb6ee3138a0b438a3653dd4d6ce0cc6510a45057"
+  integrity sha512-t13BGPUlFDR7wRB5kQDG4jjl7XeuH6jbJGt11JHPL96qwsEHNX2+68tFXqc1/k+/jALsbSWJKUOT/hcYAZ5LkA==
 
 process-nextick-args@~2.0.0:
   version "2.0.0"
@@ -3441,10 +3441,10 @@ symbol-tree@^3.2.2:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
   integrity sha1-rifbOPZgp64uHDt9G8KQgZuFGeY=
 
-syzoj-renderer@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/syzoj-renderer/-/syzoj-renderer-1.2.2.tgz#b1b468cb80f22f9d47228353c69c64e00ba3409d"
-  integrity sha512-5y5RxMGtTAKqZ/BJPysoImcEnTLsQuxcOEDgyZ8hBXmo8hsTa+FM9EeefbMy1k35DeUcLKH1PNMXVRfibvxb5g==
+syzoj-renderer@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/syzoj-renderer/-/syzoj-renderer-1.2.3.tgz#638daffd00c2b3ae06fa78e9ab834bc51da4090f"
+  integrity sha512-ulsKrdHMjWiTYSzsGrKSXeMAt541zArisOt3iEeAjI9KpR8jYiY7ekWVHNYWfT+s38RhpwBnhpMxAvmaTKXxrw==
   dependencies:
     babel-runtime "^6.26.0"
     cheerio "^1.0.0-rc.10"
