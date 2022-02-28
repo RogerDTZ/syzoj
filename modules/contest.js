@@ -4,6 +4,7 @@ let ContestPlayer = syzoj.model("contest_player");
 let Problem = syzoj.model("problem");
 let JudgeState = syzoj.model("judge_state");
 let User = syzoj.model("user");
+let UserGroup = syzoj.model('user_group');
 
 const jwt = require("jsonwebtoken");
 const {
@@ -27,6 +28,10 @@ app.get("/contests", async (req, res) => {
       start_time: "DESC",
     });
 
+    let acce = {};
+    for (let contest of contests)
+      acce[contest.id] = await contest.getAccess(res.locals.user);
+
     await contests.forEachAsync(
       async (x) => (x.subtitle = await syzoj.utils.markdown(x.subtitle))
     );
@@ -34,6 +39,7 @@ app.get("/contests", async (req, res) => {
     res.render("contests", {
       contests: contests,
       paginate: paginate,
+      accessbility: acce
     });
   } catch (e) {
     syzoj.log(e);
@@ -66,8 +72,7 @@ app.get("/contest/:id/edit", async (req, res) => {
       await contest.loadRelationships();
     }
 
-    let problems = [],
-      admins = [];
+    let problems = [], admins = [], contestants = [], usergroups = [];
     if (contest.problems)
       problems = await contest.problems
         .split("|")
@@ -76,11 +81,21 @@ app.get("/contest/:id/edit", async (req, res) => {
       admins = await contest.admins
         .split("|")
         .mapAsync(async (id) => await User.findById(id));
+    if (contest.contestants) 
+      contestants = await contest.contestants
+        .split('|')
+        .mapAsync(async (id) => await User.findById(id));
+    if (contest.contestant_groups) 
+      usergroups = await contest.contestant_groups
+        .split('|')
+        .mapAsync(async (id) => await UserGroup.findById(id));
 
     res.render("contest_edit", {
       contest: contest,
       problems: problems,
       admins: admins,
+      contestants: contestants,
+      usergroups: usergroups
     });
   } catch (e) {
     syzoj.log(e);
@@ -134,11 +149,42 @@ app.post("/contest/:id/edit", async (req, res) => {
     if (!req.body.title.trim()) throw new ErrorMessage("比赛名不能为空。");
     contest.title = req.body.title;
     contest.subtitle = req.body.subtitle;
-    if (!Array.isArray(req.body.problems))
-      req.body.problems = [req.body.problems];
+    if (req.body.problems == undefined)
+      req.body.problems = [];
+    if (req.body.admins == undefined)
+      req.body.admins = [];
+    if (req.body.contestants == undefined)
+      req.body.contestants = [];
+    if (req.body.usergroups == undefined)
+      req.body.usergroups = [];
+    if (!Array.isArray(req.body.problems)) req.body.problems = [req.body.problems];
     if (!Array.isArray(req.body.admins)) req.body.admins = [req.body.admins];
+    if (!Array.isArray(req.body.contestants)) req.body.contestants = [req.body.contestants];
+    if (!Array.isArray(req.body.usergroups)) req.body.usergroups = [req.body.usergroups];
+    for (let i in req.body.problems) {
+      let str = req.body.problems[i];
+      if (str[0] == 's')
+        req.body.problems[i] = str.slice(15);
+    }
+    for (let i in req.body.admins) {
+      let str = req.body.admins[i];
+      if (str[0] == 's')
+        req.body.admins[i] = str.slice(12);
+    }
+    for (let i in req.body.contestants) {
+      let str = req.body.contestants[i];
+      if (str[0] == 's')
+        req.body.contestants[i] = str.slice(18);
+    }
+    for (let i in req.body.usergroups) {
+      let str = req.body.usergroups[i];
+      if (str[0] == 's')
+        req.body.usergroups[i] = str.slice(17);
+    }
     contest.problems = req.body.problems.join("|");
     contest.admins = req.body.admins.join("|");
+    contest.contestants = req.body.contestants.join('|');
+    contest.contestant_groups = req.body.usergroups.join('|');
     contest.information = req.body.information;
     contest.start_time = syzoj.utils.parseDate(req.body.start_time);
     contest.end_time = syzoj.utils.parseDate(req.body.end_time);
@@ -174,6 +220,9 @@ app.get("/contest/:id", async (req, res) => {
           !contest.admins.includes(res.locals.user.id.toString())))
     )
       throw new ErrorMessage("比赛未公开，请耐心等待 (´∀ `)");
+
+    if (! await contest.isContestant(curUser))
+      throw new ErrorMessage("对不起，你没有访问" + contest.title + "的权限");
 
     contest.running = contest.isRunning();
     contest.ended = contest.isEnded();
@@ -330,6 +379,9 @@ app.get("/contest/:id/ranklist", async (req, res) => {
     )
       throw new ErrorMessage("比赛未公开，请耐心等待 (´∀ `)");
 
+    if (! await contest.isContestant(curUser))
+      throw new ErrorMessage("对不起，你没有访问" + contest.title + "的权限");
+
     if (
       [
         contest.allowedSeeingResult() && contest.allowedSeeingOthers(),
@@ -449,6 +501,9 @@ app.get("/contest/:id/submissions", async (req, res) => {
           !contest.admins.includes(res.locals.user.id.toString())))
     )
       throw new ErrorMessage("比赛未公开，请耐心等待 (´∀ `)");
+
+    if (! await contest.isContestant(res.locals.user))
+      throw new ErrorMessage("对不起，你没有访问" + contest.title + "的权限");
 
     if (contest.isEnded()) {
       res.redirect(
@@ -615,6 +670,9 @@ app.get("/contest/submission/:id", async (req, res) => {
     const contest = await Contest.findById(judge.type_info);
     contest.ended = contest.isEnded();
 
+    if (! await contest.isContestant(curUser))
+      throw new ErrorMessage("对不起，你没有访问" + contest.title + "的权限");
+
     const displayConfig = getDisplayConfig(contest);
     displayConfig.showCode = true;
 
@@ -673,6 +731,9 @@ app.get("/contest/:id/problem/:pid", async (req, res) => {
     let contest = await Contest.findById(contest_id);
     if (!contest) throw new ErrorMessage("无此比赛。");
     const curUser = res.locals.user;
+
+    if (! await contest.isContestant(curUser))
+      throw new ErrorMessage("对不起，你没有访问" + contest.title + "的权限");
 
     let problems_id = await contest.getProblems();
 
@@ -736,6 +797,9 @@ app.get("/contest/:id/:pid/download/additional_file", async (req, res) => {
     let id = parseInt(req.params.id);
     let contest = await Contest.findById(id);
     if (!contest) throw new ErrorMessage("无此比赛。");
+
+    if (! await contest.isContestant(res.locals.user))
+      throw new ErrorMessage("对不起，你没有访问" + contest.title + "的权限");
 
     let problems_id = await contest.getProblems();
 

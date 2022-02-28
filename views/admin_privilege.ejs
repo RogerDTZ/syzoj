@@ -22,7 +22,11 @@ let privileges = {
   <% for (let user of users) { %>
     <tr>
       <td><%= user.user.id %></td>
-      <td><%= user.user.username %></td>
+      <td>
+        <a href="<%= syzoj.utils.makeUrl(['user', user.user.id]) %>">
+          <%= user.user.username %>
+        </a>
+      </td>
       <% for (let privilege in privileges) { %>
         <td>
           <div class="ui fitted toggle checkbox checkbox_privilege" data-user="<%= user.user.id %>" data-name="<%= privilege %>">

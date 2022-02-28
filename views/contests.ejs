@@ -15,6 +15,7 @@
     <table class="ui very basic center aligned table">
       <thead>
         <tr>
+          <th>Accessibility</th>
           <th>Title</th>
           <th>Start At</th>
           <th>End At</th>
@@ -36,7 +37,27 @@
             <% tag = '<span class="ui header"><div class="ui mini grey label">Finished</div></span>' %>
           <% } %>
 
-          <td><a href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>"><%= contest.title %> <%- tag %></a></td>
+          <td>
+            <% if (accessibility[contest.id].isContestant) { %>
+              <i class="check green icon"></i>
+            <% } else { %>
+              <i class="x red icon"></i>
+            <% } %>
+            <% if (accessibility[contest.id].isAdmin) { %>
+              <i class="user yellow icon"></i>
+            <% } %>
+          </td>
+          <td>
+            <% if (accessibility[contest.id].isContestant) { %>
+              <a href="<%= syzoj.utils.makeUrl(['contest', contest.id]) %>">
+                <%= contest.title %>
+                <%- tag %>
+              </a>
+            <% } else {%>
+              <%= contest.title %>
+              <%- tag %>
+            <% } %>
+          </td>
           <td><%= syzoj.utils.formatDate(contest.start_time) %></td>
           <td><%= syzoj.utils.formatDate(contest.end_time) %></td>
           <td class="font-content"><%- contest.subtitle %></td>

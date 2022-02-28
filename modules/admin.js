@@ -4,6 +4,8 @@ let Article = syzoj.model('article');
 let Contest = syzoj.model('contest');
 let User = syzoj.model('user');
 let UserPrivilege = syzoj.model('user_privilege');
+let UserGroup = syzoj.model('user_group');
+let UserGroupMap = syzoj.model('user_group_map');
 const RatingCalculation = syzoj.model('rating_calculation');
 const RatingHistory = syzoj.model('rating_history');
 let ContestPlayer = syzoj.model('contest_player');
@@ -481,6 +483,121 @@ app.get('/admin/serviceID', async (req, res) => {
     res.send({
         serviceID: syzoj.serviceID
     });
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    })
+  }
+});
+
+/* Modify Usergroup */
+app.get('/admin/usergroup', async (req, res) => {
+  try {
+    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+
+    let users_arr = await User.find();
+    let users = {};
+    for (let user of users_arr) {
+      users[user.id] = user;
+    }
+    let usergroups = await UserGroup.find();
+    let data = [];
+    for (let ug of usergroups) {
+      let group_member = [];
+      let links = await UserGroupMap.find({ where: { usergroup_id: ug.id } });
+      for (let link of links) {
+        let user = users[link.user_id];
+        group_member.push(user);
+      }
+      data.push({
+        usergroup: ug,
+        member: group_member
+      });
+    }
+    res.render('admin_usergroup', {
+      usergroups: Object.values(data)
+    });
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    })
+  }
+});
+
+app.post('/admin/usergroup', async (req, res) => {
+  try {
+    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+
+    let to_remove = await UserGroupMap.find();
+    for (let link of to_remove)
+      await UserGroupMap.remove(link);
+    let data = req.body;
+    for (let x in data) {
+      let ug_id = parseInt(x.slice(15));
+      if (x.slice(0, 14) == 'usergroup_memb') {
+        let member = data[x];
+        if (!Array.isArray(member))
+          member = [member];
+        for (let user_id_str of member) {
+          let user_id = -1;
+          if (user_id_str[0] == 's')
+            user_id = parseInt(user_id_str.slice(12));
+          else
+            user_id = parseInt(user_id_str);
+          link = new UserGroupMap();
+          link.usergroup_id = ug_id;
+          link.user_id = user_id;
+          await UserGroupMap.save(link);
+        }
+      } else {
+        if (data[x] == '')
+          throw new ErrorMessage('用户组名不能为空!');
+        let ug = await UserGroup.findOne({ where: { id: ug_id } });
+        ug.name = data[x];
+        await UserGroup.save(ug);
+      }
+    }
+    res.redirect(syzoj.utils.makeUrl(['admin', 'usergroup']));
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    })
+  }
+});
+
+
+app.post('/admin/usergroup/add', async (req, res) => {
+  try {
+    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    let usergroup = new UserGroup();
+    usergroup.name = '新建分组';
+    await UserGroup.save(usergroup);
+    res.redirect(syzoj.utils.makeUrl(['admin', 'usergroup']));
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    })
+  }
+});
+
+app.post('/admin/usergroup/delete/:id', async (req, res) => {
+  try {
+    if (!res.locals.user || !res.locals.user.is_admin) throw new ErrorMessage('您没有权限进行此操作。');
+    let id = parseInt(req.params.id);
+    let usergroup = await UserGroup.findOne({ where: { id: id } });
+    if (usergroup) {
+      rec_list = await UserGroupMap.find({ where: { usergroup_id: id } });
+      for (let rec of rec_list)
+        await UserGroupMap.remove(rec);
+      await UserGroup.remove(usergroup);
+    } else {
+      throw new ErrorMessage('不存在该分组');
+    }
+    res.redirect(syzoj.utils.makeUrl(['admin', 'usergroup']));
   } catch (e) {
     syzoj.log(e);
     res.render('error', {

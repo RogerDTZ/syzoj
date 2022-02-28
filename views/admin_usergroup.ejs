@@ -1,0 +1,97 @@
+<% this.adminPage='usergroup'; %>
+<% include admin_header %>
+<form action="<%= syzoj.utils.makeUrl(['admin', 'usergroup']) %>" method="post" , id="usergroup_form">
+  <table class="ui center aligned celled table">
+    <thead>
+      <tr>
+        <th width="20%">分组名称</th>
+        <th width="10%">操作</th>
+        <th width="80%">分组成员</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% for (let ugpair of usergroups) { %>
+        <tr>
+          <td>
+            <p class="ui input">
+              <input type="text" name="usergroup_name_<%= ugpair.usergroup.id %>"
+                value="<%= ugpair.usergroup.name %>" placeholder="请输入分组名" style="text-align: center;">
+          </td>
+          <td>
+            <div class="ui tiny modal" id="modal-delete-<%= ugpair.usergroup.id %>">
+              <div class="ui icon header">
+                <i class="trash icon"></i>
+                <p style="margin-top: 15px; ">删除分组</p>
+              </div>
+              <div class="content" style="text-align: center; ">
+                <p><br>
+                  <b>确认删除分组"<%= ugpair.usergroup.name %>"?</b>
+              </div>
+              <div class="actions" style="text-align: center;">
+                <div class="ui red cancel inverted button">
+                  <i class="remove icon"></i>
+                  否
+                </div>
+                <a class="ui green ok inverted button"
+                  href-post="<%= syzoj.utils.makeUrl(['admin', 'usergroup', 'delete', ugpair.usergroup.id]) %>">
+                  <i class="checkmark icon"></i>
+                  是
+                </a>
+              </div>
+            </div>
+            <a class="tiny ui icon button" onclick="$('#modal-delete-<%= ugpair.usergroup.id %>').modal('show')">
+              <i class="trash icon"></i>
+            </a>
+          </td>
+          <td>
+            <select class="ui fluid search dropdown" multiple="" id="search_user_<%= ugpair.usergroup.id %>"
+              name="usergroup_memb_<%= ugpair.usergroup.id %>">
+              <% for (let user of ugpair.member) { %>
+                <option value="select_user_<%= user.id %>" selected>
+                  <%= user.username %>
+                </option>
+                <% } %>
+            </select>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</form>
+<div style="text-align: center; ">
+  <a>
+    <button class="ui blue labeled icon button" id="submit_button" type="submit" form="usergroup_form">
+      <i class="ui edit icon"></i>
+      提交
+    </button>
+  </a>
+  <a>
+    <a class="ui green labeled icon button" href-post="<%= syzoj.utils.makeUrl(['admin', 'usergroup', 'add']) %>">
+      <i class="ui plus icon"></i>
+      新增组
+    </a>
+  </a>
+</div>
+<script>
+  <% for (let ugpair of usergroups) { %>
+    $(function () {
+      $('#search_user_<%= ugpair.usergroup.id %>')
+        .dropdown({
+          debug: true,
+          apiSettings: {
+            url: '/api/v2/search/users/{query}',
+            onResponse: function (response) {
+              var a = $('#search_user_<%= ugpair.usergroup.id %>').val().map(function (x) { return parseInt(x) });
+              if (response.results) {
+                response.results = response.results.filter(function (x) { return !a.includes(parseInt(x.value)) });
+              }
+              return response;
+            },
+            cache: false
+          }
+        });
+    });
+  <% } %>
+</script>
+<% include admin_footer %>

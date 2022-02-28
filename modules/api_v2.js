@@ -73,6 +73,41 @@ app.get('/api/v2/search/problems/:keyword*?', async (req, res) => {
   }
 });
 
+app.get('/api/v2/search/usergroups/:keyword*?', async (req, res) => {
+  try {
+    let UserGroup = syzoj.model('user_group');
+
+    let keyword = req.params.keyword || '';
+    let conditions = [];
+    const uid = parseInt(keyword) || 0;
+
+    if (uid != null && !isNaN(uid)) {
+      conditions.push({ id: uid });
+    }
+    if (keyword != null && String(keyword).length >= 2) {
+      conditions.push({ name: TypeORM.Like(`%${req.params.keyword}%`) });
+    }
+    if (conditions.length === 0) {
+      res.send({ success: true, results: [] });
+    } else {
+      let usergroups = await UserGroup.find({
+        where: conditions,
+        order: {
+          name: 'ASC'
+        }
+      });
+
+      let result = [];
+
+      result = usergroups.map(x => ({ name: `${x.name}`, value: x.id }));
+      res.send({ success: true, results: result });
+    }
+  } catch (e) {
+    syzoj.log(e);
+    res.send({ success: false });
+  }
+});
+
 app.get('/api/v2/search/tags/:keyword*?', async (req, res) => {
   try {
     let Problem = syzoj.model('problem');
