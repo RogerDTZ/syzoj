@@ -15,7 +15,7 @@
                 <label>试题列表</label>
                 <select class="ui fluid search dropdown" multiple="" id="search_problems" name="problems">
                 <% for (let problem of problems) { %>
-                <option value="<%= problem.id %>" selected>#<%= problem.id %>. <%= problem.title %></option>
+                <option value="select_problem_<%= problem.id %>" selected>#<%= problem.id %>. <%= problem.title %></option>
                 <% } %>
                 </select>
             </div>
@@ -23,9 +23,29 @@
                 <label>比赛管理员</label>
                 <select class="ui fluid search dropdown" multiple="" id="search_admins" name="admins">
                 <% for (let admin of admins) { %>
-                <option value="<%= admin.id %>" selected><%= admin.username %></option>
+                <option value="select_user_<%= admin.id %>" selected><%= admin.username %></option>
                 <% } %>
                 </select>
+            </div>
+            <div class="field">
+              <label>参赛者</label>
+              <select class="ui fluid search dropdown" multiple="" id="search_users" name="contestants">
+                <% for (let user of contestants) { %>
+                  <option value="select_contestant_<%= user.id %>" selected>
+                    <%= user.username %>
+                  </option>
+                  <% } %>
+              </select>
+            </div>
+            <div class="field">
+              <label>参赛用户组</label>
+              <select class="ui fluid search dropdown" multiple="" id="search_usergroups" name="usergroups">
+                <% for (let group of usergroups) { %>
+                  <option value="select_usergroup_<%= group.id %>" selected>
+                    <%= group.name %>
+                  </option>
+                  <% } %>
+              </select>
             </div>
             <div class="inline fields">
               <label>赛制</label>
@@ -109,6 +129,36 @@ $(function () {
           var a = $('#search_problems').val().map(function (x) { return parseInt(x) });
           if (response.results) {
             response.results = response.results.filter(function(x) {return !a.includes(parseInt(x.value));});
+          }
+          return response;
+        },
+        cache: false
+      }
+    });
+  $('#search_users')
+    .dropdown({
+      debug: true,
+      apiSettings: {
+        url: '/api/v2/search/users/{query}',
+        onResponse: function (response) {
+          var a = $('#search_users').val().map(function (x) { return parseInt(x) });
+          if (response.results) {
+            response.results = response.results.filter(function (x) { return !a.includes(parseInt(x.value)); });
+          }
+          return response;
+        },
+        cache: false
+      }
+    });
+  $('#search_usergroups')
+    .dropdown({
+      debug: true,
+      apiSettings: {
+        url: '/api/v2/search/usergroups/{query}',
+        onResponse: function (response) {
+          var a = $('#search_usergroups').val().map(function (x) { return parseInt(x) });
+          if (response.results) {
+            response.results = response.results.filter(function (x) { return !a.includes(parseInt(x.value)); });
           }
           return response;
         },

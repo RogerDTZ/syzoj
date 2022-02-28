@@ -7,6 +7,7 @@ import User from "./user";
 import Problem from "./problem";
 import ContestRanklist from "./contest_ranklist";
 import ContestPlayer from "./contest_player";
+import UserGroupMap from "./user_group_map";
 
 enum ContestType {
   NOI = "noi",
@@ -60,6 +61,12 @@ export default class Contest extends Model {
   @TypeORM.Column({ nullable: true, type: "boolean" })
   hide_statistics: boolean;
 
+  @TypeORM.Column({ nullable: false, type: "text", default: ""})
+  contestants: string;
+
+  @TypeORM.Column({ nullable: true, type: "text", default: ""})
+  contestant_groups: string;
+
   holder?: User;
   ranklist?: ContestRanklist;
 
@@ -70,6 +77,27 @@ export default class Contest extends Model {
 
   async isSupervisior(user) {
     return user && (user.is_admin || this.holder_id === user.id || this.admins.split('|').includes(user.id.toString()));
+  }
+
+  async isContestant(user) {
+    if (!user)
+      return false;
+    if (await this.isSupervisior(user) || (this.contestants != '' && this.contestants.split('|').includes(user.id.toString())))
+      return true;
+    let groups = this.contestant_groups.split('|');
+    for (let group_id of groups) {
+      let record = await UserGroupMap.findOne({ where: { usergroup_id: group_id, user_id: user.id } });
+      if (record)
+        return true;
+    }
+    return false;
+  }
+
+  async getAccess(user) {
+    return {
+      isContestant: await this.isContestant(user),
+      isAdmin: await this.isSupervisior(user)
+    }
   }
 
   allowedSeeingOthers() {
@@ -140,6 +168,8 @@ export default class Contest extends Model {
       await this.ranklist.save();
     });
   }
+
+
 
   isRunning(now?) {
     if (!now) now = syzoj.utils.getCurrentDate();
